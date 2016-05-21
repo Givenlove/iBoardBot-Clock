@@ -6,23 +6,23 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
 using iBoardBot.Helpers;
+using iBoardBot.Properties;
 
 namespace iBoardBot {
     internal class Program {
-        private static void Main(string[] args) {
-            if (!args.Any()) {
-                Console.WriteLine("ApiKey should be supplied.");
-                return;
-            }
+        private static void Main() {
+            var baseUrl = Settings.Default.BaseUrl;
+            var appId = Settings.Default.AppId;
+            var font = Settings.Default.FontFamily;
+            var fontSize = Settings.Default.FontSize;
+            var dateFormat = Settings.Default.DateTimeFormat;
 
-            var apiKey = args.First();
-            var baseUrl = new Uri("http://ibbapp.jjrobots.com/");
-            var board = new BoardClient(baseUrl, apiKey);
-            var fontFamily = LoadFontFamilyFromFile("Modenine.ttf");
-            var lastImage = RenderText(fontFamily, "");
+            var board = new BoardClient(baseUrl, appId);
+            var fontFamily = LoadFontFamilyFromFile(font);
+            var lastImage = RenderText(fontFamily, fontSize, "");
 
             while (true) {
-                var newImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
+                var newImage = RenderText(fontFamily, fontSize, DateTime.Now.ToString(dateFormat));
                 var differences = GetDifferences(lastImage, newImage).ToArray();
 
                 if (differences.Length > 0) {
@@ -43,10 +43,10 @@ namespace iBoardBot {
             }
         }
 
-        private static Bitmap RenderText(FontFamily fontCollection, string text) {
+        private static Bitmap RenderText(FontFamily fontFamily, int size, string text) {
             var bitmap = new Bitmap(716, 240);
             using (var graphics = Graphics.FromImage(bitmap)) {
-                using (var font = new Font(fontCollection, 120, FontStyle.Regular, GraphicsUnit.Pixel)) {
+                using (var font = new Font(fontFamily, size, FontStyle.Regular, GraphicsUnit.Pixel)) {
                     var rectangle = new Rectangle(0, 0, 716, 240);
                     var stringFormat = new StringFormat {
                         Alignment = StringAlignment.Center,
@@ -85,7 +85,6 @@ namespace iBoardBot {
                 }
             }
         }
-
         private static FontFamily LoadFontFamilyFromFile(string fileName) {
             var fontCollection = new PrivateFontCollection();
             fontCollection.AddFontFile(fileName);
