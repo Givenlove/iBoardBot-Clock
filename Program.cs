@@ -15,8 +15,11 @@ namespace iBoardBot {
             var fontFamily = LoadFontFamilyFromFile("Modenine.ttf");
             var lastImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
 
+            //Initial draw.
             board.Clear();
+            board.Draw(lastImage);
 
+            //Update clock when needed.
             while (true) {
                 var newImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
                 var differences = GetDifferences(lastImage, newImage).ToArray();
