@@ -10,8 +10,14 @@ using iBoardBot.Helpers;
 namespace iBoardBot {
     internal class Program {
         private static void Main(string[] args) {
+            if (!args.Any()) {
+                Console.WriteLine("ApiKey should be supplied.");
+                return;
+            }
+
+            var apiKey = args.First();
             var baseUrl = new Uri("http://ibbapp.jjrobots.com/");
-            var board = new BoardClient(baseUrl, "YOUR_APIKEY");
+            var board = new BoardClient(baseUrl, apiKey);
             var fontFamily = LoadFontFamilyFromFile("Modenine.ttf");
             var lastImage = RenderText(fontFamily, "");
 

@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Text;
+using CsQuery;
 
 namespace iBoardBot.Helpers {
     public class BoardClient {
@@ -86,7 +87,7 @@ namespace iBoardBot.Helpers {
         }
 
         private static void GetWorkItemFromDom(out string workItemId, out string isLastWorkItem, string result) {
-            var dom = CsQuery.CQ.CreateDocument(result);
+            var dom = CQ.CreateDocument(result);
 
             //Get Queue Id
             workItemId = dom["input[name='WORK']"].Val();
@@ -100,7 +101,7 @@ namespace iBoardBot.Helpers {
                 var url = _baseUrl + "pImage.php";
                 var bytes = BitmapToArray(img);
                 var result = UploadHelper.HttpUploadFile(url, bytes, "imgfile", "image/png", new NameValueCollection {{"APPID", _appid}});
-                var dom = CsQuery.CQ.CreateDocument(result);
+                var dom = CQ.CreateDocument(result);
 
                 var svgFileName = dom["input[name='SVGLOCALFILE']"].Val();
                 var gfile = dom["input[name='GFILE']"].Val();
