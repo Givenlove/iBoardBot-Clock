@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
-using Point = iBoardBot.Models.Point;
+using iBoardBot.Helpers;
 
 namespace iBoardBot {
     internal class Program {

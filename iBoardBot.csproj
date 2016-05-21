@@ -49,9 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardClient.cs" />
+    <Compile Include="Helpers\BoardClient.cs" />
     <Compile Include="Helpers\UploadHelper.cs" />
-    <Compile Include="Models\Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

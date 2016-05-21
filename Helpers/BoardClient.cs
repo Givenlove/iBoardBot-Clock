@@ -5,9 +5,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Text;
-using iBoardBot.Helpers;
 
-namespace iBoardBot {
+namespace iBoardBot.Helpers {
     public class BoardClient {
         private readonly Uri _baseUrl;
         private readonly string _appid;
