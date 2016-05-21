@@ -47,7 +47,7 @@ namespace iBoardBot {
             var bitmap = new Bitmap(716, 240);
             using (var graphics = Graphics.FromImage(bitmap)) {
                 using (var font = new Font(fontFamily, size, FontStyle.Regular, GraphicsUnit.Pixel)) {
-                    var rectangle = new Rectangle(0, 0, 716, 240);
+                    var rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
                     var stringFormat = new StringFormat {
                         Alignment = StringAlignment.Center,
                         LineAlignment = StringAlignment.Center
@@ -62,7 +62,6 @@ namespace iBoardBot {
 
             return bitmap;
         }
-
 
         public static Bitmap GetRegionFromBitmap(Bitmap srcBitmap, Rectangle srcRegion) {
             var newBitmap = new Bitmap(srcBitmap.Width, srcBitmap.Height);
