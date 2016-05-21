@@ -4,6 +4,6 @@ This does not use a so-called API (as i could not find any documentation), but u
 
 Commandline usage:
 
-    iBoardBot.exe YOUR_APIKEY
+    iBoardBot.exe YOUR_APPID
 
 More information can be found at http://jjrobots.com/
