@@ -5,22 +5,22 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
+using Point = iBoardBot.Models.Point;
 
 namespace iBoardBot {
     internal class Program {
-        static void Main(string[] args) {
+        private static void Main(string[] args) {
             var baseUrl = new Uri("http://ibbapp.jjrobots.com/");
             var board = new BoardClient(baseUrl, "YOUR_APIKEY");
-            var fontFamily = LoadFontFamily("Modenine.ttf");
+            var fontFamily = LoadFontFamilyFromFile("Modenine.ttf");
             var lastImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
 
             board.Clear();
 
             while (true) {
                 var newImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
+                var differences = GetDifferences(lastImage, newImage).ToArray();
 
-                //Update drawing.
-                var differences = GetDifferencBitmap(lastImage, newImage).ToArray();
                 if (differences.Length > 0) {
                     var minX = differences.Min(point => point.X);
                     var maxX = differences.Max(point => point.X);
@@ -30,22 +30,13 @@ namespace iBoardBot {
                     board.Clear(minX/2, minY/2, maxX/2, maxY/2);
 
                     var region = new Rectangle(minX, minY, maxX - minX, maxY - minY);
-                    var diff = RegionFromBitmap(newImage, region);
+                    var redrawImage = GetRegionFromBitmap(newImage, region);
 
-                    board.Draw(diff);
+                    board.Draw(redrawImage);
                 }
 
                 Thread.Sleep(1000);
             }
-        }
-
-        public static Bitmap RegionFromBitmap(Bitmap srcBitmap, Rectangle srcRegion) {
-            var newBitmap = new Bitmap(srcBitmap.Width, srcBitmap.Height);
-            using (var graphics = Graphics.FromImage(newBitmap)) {
-                graphics.Clear(Color.White);
-                graphics.DrawImage(srcBitmap, srcRegion, srcRegion, GraphicsUnit.Pixel);
-            }
-            return newBitmap;
         }
 
         private static Bitmap RenderText(FontFamily fontCollection, string text) {
@@ -68,7 +59,17 @@ namespace iBoardBot {
             return bitmap;
         }
 
-        private static IEnumerable<Point> GetDifferencBitmap(Bitmap bmp1, Bitmap bmp2) {
+
+        public static Bitmap GetRegionFromBitmap(Bitmap srcBitmap, Rectangle srcRegion) {
+            var newBitmap = new Bitmap(srcBitmap.Width, srcBitmap.Height);
+            using (var graphics = Graphics.FromImage(newBitmap)) {
+                graphics.Clear(Color.White);
+                graphics.DrawImage(srcBitmap, srcRegion, srcRegion, GraphicsUnit.Pixel);
+            }
+            return newBitmap;
+        }
+
+        private static IEnumerable<Point> GetDifferences(Bitmap bmp1, Bitmap bmp2) {
             for (var y = 0; y < bmp1.Height; y++) {
                 for (var x = 0; x < bmp1.Width; x++) {
                     var c1 = bmp1.GetPixel(x, y);
@@ -81,7 +82,7 @@ namespace iBoardBot {
             }
         }
 
-        private static FontFamily LoadFontFamily(string fileName) {
+        private static FontFamily LoadFontFamilyFromFile(string fileName) {
             var fontCollection = new PrivateFontCollection();
             fontCollection.AddFontFile(fileName);
             return fontCollection.Families[0];
