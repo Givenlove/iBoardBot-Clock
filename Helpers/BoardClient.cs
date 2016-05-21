@@ -17,35 +17,35 @@ namespace iBoardBot.Helpers {
             _appid = appid;
         }
 
-        public void Write(string message) {
-            using (var client = new WebClient()) {
-                client.BaseAddress = _baseUrl.ToString();
+        public void Execute(string text) {
+            string workItemId;
+            string isLastWorkItem;
 
-                string workItemId;
-                string isLastWorkItem;
-                if (TrySendTextToQueue(message, out workItemId, out isLastWorkItem)) {
-                    client.UploadValues("send.php", new NameValueCollection {
-                        {"APPID", _appid},
-                        {"WORK", workItemId},
-                        {"LAST", isLastWorkItem}
-                    });
-                }
+            if (TrySendTextToQueue(text, out workItemId, out isLastWorkItem)) {
+                Execute(workItemId, isLastWorkItem);
             }
         }
 
-        public void Draw(Bitmap bmp) {
+        public void Execute(Bitmap image) {
+            string workItemId;
+            string isLastWorkItem;
+
+            if (TrySendImageToQueue(image, out workItemId, out isLastWorkItem)) {
+                Execute(workItemId, isLastWorkItem);
+            }
+        }
+
+        private void Execute(string workItemId, string isLastWorkItem) {
             using (var client = new WebClient()) {
                 client.BaseAddress = _baseUrl.ToString();
 
-                string workItemId;
-                string isLastWorkItem;
-                if (TrySendImageToQueue(bmp, out workItemId, out isLastWorkItem)) {
-                    client.UploadValues("send.php", new NameValueCollection {
-                        {"APPID", _appid},
-                        {"WORK", workItemId},
-                        {"LAST", isLastWorkItem}
-                    });
-                }
+                var parameters = new NameValueCollection {
+                    {"APPID", _appid},
+                    {"WORK", workItemId},
+                    {"LAST", isLastWorkItem}
+                };
+
+                client.UploadValues("send.php", parameters);
             }
         }
 
@@ -73,9 +73,7 @@ namespace iBoardBot.Helpers {
                     });
 
                     var result = Encoding.UTF8.GetString(response);
-
                     GetWorkItemFromDom(out workItemId, out isLastWorkItem, result);
-
                     return true;
                 }
             }
@@ -84,16 +82,6 @@ namespace iBoardBot.Helpers {
                 isLastWorkItem = null;
                 return false;
             }
-        }
-
-        private static void GetWorkItemFromDom(out string workItemId, out string isLastWorkItem, string result) {
-            var dom = CQ.CreateDocument(result);
-
-            //Get Queue Id
-            workItemId = dom["input[name='WORK']"].Val();
-
-            //Get IsLast value (not sure if needed)
-            isLastWorkItem = dom["input[name='LAST']"].Val();
         }
 
         private bool TrySendImageToQueue(Image img, out string workItemId, out string isLastWorkItem) {
@@ -119,7 +107,6 @@ namespace iBoardBot.Helpers {
                     };
 
                     var response = client.UploadValues("pSVG.php", parameters);
-
                     GetWorkItemFromDom(out workItemId, out isLastWorkItem, Encoding.UTF8.GetString(response));
                 }
 
@@ -132,7 +119,13 @@ namespace iBoardBot.Helpers {
             }
         }
 
-        private static Byte[] BitmapToArray(Image bitmap) {
+        private static void GetWorkItemFromDom(out string workItemId, out string isLastWorkItem, string result) {
+            var dom = CQ.CreateDocument(result);
+            workItemId = dom["input[name='WORK']"].Val();
+            isLastWorkItem = dom["input[name='LAST']"].Val();
+        }
+
+        private static byte[] BitmapToArray(Image bitmap) {
             using (var stream = new MemoryStream()) {
                 bitmap.Save(stream, ImageFormat.Bmp);
                 return stream.ToArray();

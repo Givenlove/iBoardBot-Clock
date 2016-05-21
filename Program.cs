@@ -36,7 +36,7 @@ namespace iBoardBot {
                     var region = new Rectangle(minX, minY, maxX - minX, maxY - minY);
                     var redrawImage = GetRegionFromBitmap(newImage, region);
 
-                    board.Draw(redrawImage);
+                    board.Execute(redrawImage);
                 }
 
                 Thread.Sleep(1000);
