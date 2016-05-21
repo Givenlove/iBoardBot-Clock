@@ -13,13 +13,8 @@ namespace iBoardBot {
             var baseUrl = new Uri("http://ibbapp.jjrobots.com/");
             var board = new BoardClient(baseUrl, "YOUR_APIKEY");
             var fontFamily = LoadFontFamilyFromFile("Modenine.ttf");
-            var lastImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
+            var lastImage = RenderText(fontFamily, "");
 
-            //Initial draw.
-            board.Clear();
-            board.Draw(lastImage);
-
-            //Update clock when needed.
             while (true) {
                 var newImage = RenderText(fontFamily, DateTime.Now.ToString("HH:mm"));
                 var differences = GetDifferences(lastImage, newImage).ToArray();
