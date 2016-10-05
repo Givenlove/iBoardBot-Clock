@@ -21,22 +21,27 @@ namespace iBoardBot {
             var fontFamily = LoadFontFamilyFromFile(font);
             var lastImage = RenderText(fontFamily, fontSize, "");
 
-            while (true) {
-                var newImage = RenderText(fontFamily, fontSize, DateTime.Now.ToString(dateFormat));
+            while (true)
+            {
+                var newTime = DateTime.Now.ToString(dateFormat);
+                var newImage = RenderText(fontFamily, fontSize, newTime);
                 var differences = GetDifferences(lastImage, newImage).ToArray();
 
                 if (differences.Length > 0) {
                     var minX = differences.Min(point => point.X);
                     var maxX = differences.Max(point => point.X);
-                    var minY = differences.Min(point => point.Y);
-                    var maxY = differences.Max(point => point.Y);
+                    // var minY = differences.Min(point => point.Y);
+                    // var maxY = differences.Max(point => point.Y);
 
-                    board.Clear(minX/2, minY/2, maxX/2, maxY/2);
+                    board.Clear(minX/2 - 4, 0, maxX/2, newImage.Height/2);
 
-                    var region = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+                    var region = new Rectangle(minX, 0, maxX - minX, newImage.Height);
                     var redrawImage = GetRegionFromBitmap(newImage, region);
 
+                    Console.WriteLine("drawing: {0}", newTime);
+
                     board.Execute(redrawImage);
+                    lastImage = newImage;
                 }
 
                 Thread.Sleep(1000);
@@ -73,7 +78,8 @@ namespace iBoardBot {
         }
 
         private static IEnumerable<Point> GetDifferences(Bitmap bmp1, Bitmap bmp2) {
-            for (var y = 0; y < bmp1.Height; y++) {
+            for (var y = 0; y < bmp1.Height; y++)
+            {
                 for (var x = 0; x < bmp1.Width; x++) {
                     var c1 = bmp1.GetPixel(x, y);
                     var c2 = bmp2.GetPixel(x, y);
@@ -84,6 +90,7 @@ namespace iBoardBot {
                 }
             }
         }
+
         private static FontFamily LoadFontFamilyFromFile(string fileName) {
             var fontCollection = new PrivateFontCollection();
             fontCollection.AddFontFile(fileName);
